@@ -84,10 +84,12 @@ void test_random_from_to(const at::Device& device) {
             full_64_bit_range_case_covered = true;
           } else {
             if (to.has_value()) {
-              range = *to - from;
+              // range = *to - from; // runtime error: signed integer overflow: 0 - -9223372036854775808 cannot be represented in type 'long'
+              range = static_cast<uint64_t>(*to) - static_cast<uint64_t>(from);
               from_to_case_covered = true;
             } else {
-              range = max_val - from + 1;
+              // range = max_val - from + 1; // runtime error: signed integer overflow: 9223372036854775807 - -42 cannot be represented in type 'long'
+              range = static_cast<uint64_t>(max_val) - static_cast<uint64_t>(from) + 1;
               from_case_covered = true;
             }
             if (range < (1ULL << 32)) {
